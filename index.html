@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MDR 智能文件助手 BETA II版</title>
+<style>
+:root {
+  --brand: #1664F2;
+  --user-bg: #007bff;
+  --bot-bg: #f1f3f4;
+  --border: #e1e5e9;
+  --success: #28a745;
+  --warning: #ffc107;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Heiti SC', 'Noto Sans SC', Roboto, sans-serif;
+  background: #f8f9fa;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 主容器 - 响应式设计 */
+.chat-container {
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 电脑端样式 */
+@media (min-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+  .chat-container {
+    max-width: 90vw;
+    width: 1200px;
+    height: calc(100vh - 2rem);
+  }
+}
+
+/* 手机端样式 */
+@media (max-width: 767px) {
+  .chat-container {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    height: 100vh;
+  }
+  body {
+    padding: 0;
+  }
+}
+
+/* 头部区域 */
+.chat-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+@media (max-width: 767px) {
+  .chat-header {
+    border-radius: 0;
+    padding: 1rem;
+  }
+}
+
+.chat-header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-icon {
+  width: 24px;
+  height: 24px;
+  background: var(--brand);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+}
+
+/* 功能选择区域 */
+.feature-selector {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 767px) {
+  .feature-selector {
+    padding: 0.75rem 1rem;
+  }
+}
+
+.feature-selector label {
+  margin-right: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.feature-selector select {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.9rem;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.feature-selector select:focus {
+  border-color: var(--brand);
+}
+
+/* 消息区域 */
+.chat-messages {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #f8f9fa;
+}
+
+@media (max-width: 767px) {
+  .chat-messages {
+    padding: 1rem;
+  }
+}
+
+.message {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.message.bot {
+  justify-content: flex-start;
+}
+
+.message-bubble {
+  padding: 0.75rem 1rem;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  max-width: 80%;
+  position: relative;
+}
+
+@media (max-width: 767px) {
+  .message-bubble {
+    max-width: 85%;
+  }
+}
+
+.message.user .message-bubble {
+  background: var(--user-bg);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.message.bot .message-bubble {
+  background: var(--bot-bg);
+  color: #333;
+  border-bottom-left-radius: 4px;
+  white-space: pre-wrap;
+}
+
+.message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin: 0 0.5rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.user-avatar {
+  background: var(--user-bg);
+  color: #fff;
+}
+
+.bot-avatar {
+  background: var(--bot-bg);
+  color: #666;
+}
+
+/* 输入区域 */
+.chat-input {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+}
+
+@media (max-width: 767px) {
+  .chat-input {
+    padding: 1rem;
+    border-radius: 0;
+  }
+}
+
+.input-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  position: relative;
+}
+
+.input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.input-container textarea {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  resize: none;
+  font-size: 0.9rem;
+  font-family: inherit;
+  max-height: 100px;
+  min-height: 40px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-container textarea:focus {
+  border-color: var(--brand);
+}
+
+.input-container textarea:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+  border-color: #ddd;
+}
+
+/* 文件上传按钮 */
+.file-upload-btn {
+  position: absolute;
+  right: 2rem;                 /* 靠左对齐 */
+  top: 50%;
+  transform: translateY(-55%); /* 垂直居中 */
+  background: #d3d3d3;         /* 灰色背景 */
+  border-radius: 50%;          /* 圆形 */
+  width: 40px;                 /* 圆形按钮的宽度 */
+  height: 40px;                /* 圆形按钮的高度 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.5rem;             /* 增加内边距 */
+  border: none;
+  color: #666;
+  font-size: 1.5rem;           /* 增大图标的字体大小 */
+  transition: all 0.2s;
+}
+
+.file-upload-btn:hover {
+  background: #b0b0b0;         /* 鼠标悬停时变深的灰色 */
+  color: var(--brand);
+}
+
+.file-upload-btn input[type="file"] {
+  display: none;
+}
+
+/* 发送按钮 */
+.send-btn {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.send-btn:hover {
+  opacity: 0.9;
+}
+
+.send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 文件预览区域 */
+.file-preview {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e1e5e9;
+  display: none;
+}
+
+.file-preview.show {
+  display: block;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.file-icon {
+  width: 20px;
+  height: 20px;
+  background: var(--brand);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+.file-name {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-remove {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.file-remove:hover {
+  background: #fee;
+  color: #c33;
+}
+
+/* 加载状态 */
+.typing-indicator {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+}
+
+/* 处理中提示样式 */
+.processing-indicator {
+  margin: 1rem auto;
+  padding: 0.75rem 1rem;
+  background-color: #f1f7ff;
+  border-left: 4px solid var(--brand);
+  color: #333;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: pulse 1.5s infinite;
+}
+
+.processing-indicator i {
+  color: var(--brand);
+  font-size: 1.2rem;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.typing-dots {
+  display: flex;
+  gap: 2px;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: #999;
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* 错误消息 */
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  border: 1px solid #fcc;
+}
+
+/* 欢迎消息 */
+.welcome-message {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin: 2rem 0;
+  padding: 2rem;
+}
+
+.welcome-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* 滚动条样式 */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* 文件下载链接样式 */
+.file-download {
+  display: inline-block;
+  margin: 0.25rem 0.5rem 0.25rem 0;
+  padding: 0.5rem 1rem;
+  background: var(--brand);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.file-download:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.file-downloads {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+/* 内联文件下载链接样式 */
+.file-download-inline {
+  display: inline-block;
+  margin: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  background: var(--brand);
+  color: white !important;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  line-height: 1.5;
+}
+
+.file-download-inline:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <!-- 头部 -->
+  <div class="chat-header">
+    <h1>
+      <div class="header-icon">📄</div>
+      MDR 附件管理助手 BETA I版
+    </h1>
+  </div>
+
+  <!-- 功能选择 -->
+  <div class="feature-selector">
+    <label for="featureSelection">功能选择:</label>
+    <select id="featureSelection" name="featureSelection">
+      <option value="">请选择…</option>        
+      <option value="精确分析（上传程序文件文档或图档）">精确分析（上传程序文件文档或图档）</option>
+      <option value="大致匹配（上传程序文件目录）">大致匹配（上传程序文件目录）</option>
+    </select>
+  </div>
+
+  <!-- 消息区域 -->
+  <div class="chat-messages" id="chatMessages">
+    <div class="welcome-message">
+      <div class="welcome-icon">💬</div>
+      <p>欢迎使用 MDR 附件管理助手！</p>
+      <p>本界面主要功能：</p>
+      <p>（1）上传程序文件目录，选择“大致匹配”，输入框输入“请分析”，即可开始分析所有程序文件匹配的章节，以及缺少哪些附件。</p>
+      <p>（2）上传程序文件或图纸，选择“精确分析”，输入框输入“查核内容”，即分析该文件匹配的章节，以及文件需要补强的地方。</p>
+      <p><small>支持格式：TXT, MD, PDF, DOC, DOCX, XLSX, XLS, CSV, PPT, PPTX, XML, EPUB, EML, MSG, HTML, JPG, JPEG, PNG, GIF, WEBP, SVG</small></p>
+    </div>
+  </div>
+
+  <!-- 加载指示器 -->
+  <div class="typing-indicator" id="typingIndicator">
+    <div class="typing-dots">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    正在思考中...
+  </div>
+
+  <!-- 输入区域 -->
+  <div class="chat-input">
+    <!-- 文件预览 -->
+    <div class="file-preview" id="filePreview"></div>
+    
+    <div class="input-container">
+      <div class="input-wrapper">
+        <textarea 
+          id="messageInput" 
+          placeholder="请输入您的问题，或者上传文件后提问..." 
+          rows="1"
+        ></textarea>
+        
+        <!-- 文件上传按钮 -->
+        <button class="file-upload-btn" id="fileUploadBtn" title="上传文件">
+          <input type="file" id="fileInput" multiple accept=".txt,.md,.mdx,.markdown,.pdf,.html,.xlsx,.xls,.doc,.docx,.csv,.eml,.msg,.pptx,.ppt,.xml,.epub,.jpg,.jpeg,.png,.gif,.webp,.svg">
+          +
+        </button>
+      </div>
+      
+      <!-- 发送按钮 -->
+      <button class="send-btn" id="sendBtn" title="发送消息">
+        ➤
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Dify API 配置
+const DIFY_CONFIG = {
+  baseUrl: 'https://tonywei49.vip.cpolar.cn',
+  apiKey: 'app-wtAnJl5QnfCQCoapiYZxctrG', // 请替换为您的实际API密钥
+  user: 'user-' + Math.random().toString(36).substr(2, 9) // 生成随机用户ID
+};
+
+const chatMessages = document.getElementById('chatMessages');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const fileInput = document.getElementById('fileInput');
+const fileUploadBtn = document.getElementById('fileUploadBtn');
+const filePreview = document.getElementById('filePreview');
+const typingIndicator = document.getElementById('typingIndicator');
+const featureSelection = document.getElementById('featureSelection');
+
+let uploadedFiles = [];
+let uploadedFileIds = []; // 存储上传到Dify的文件ID
+let conversationId = null;
+let currentBotMessage = null;
+let processingMessageInterval = null;
+
+// 初始状态检查发送按钮
+function checkSendButtonState() {
+  const selectedFeature = featureSelection.value;
+  const hasMessage = messageInput.value.trim() !== '';
+  const hasFiles = uploadedFileIds.length > 0;
+  
+  // 只有选择了功能并且有输入消息或上传了文件时，才启用发送按钮
+  sendBtn.disabled = !selectedFeature || (!hasMessage && !hasFiles);
+}
+
+// 监听功能选择更改
+featureSelection.addEventListener('change', checkSendButtonState);
+
+// 监听消息输入更改
+messageInput.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  checkSendButtonState();
+});
+
+// 文件上传处理
+fileUploadBtn.addEventListener('click', () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener('change', handleFileUpload);
+
+// 发送消息
+sendBtn.addEventListener('click', sendMessage);
+messageInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (!sendBtn.disabled) {
+      sendMessage();
+    }
+  }
+});
+
+// 显示处理中提示
+function showProcessingMessage() {
+  // 移除之前的处理提示（如果有）
+  removeProcessingMessage();
+  
+  const processingDiv = document.createElement('div');
+  processingDiv.className = 'processing-indicator';
+  processingDiv.id = 'processingIndicator';
+  processingDiv.innerHTML = '<i>🔄</i> 数据正在后台飞快运算中，请耐心等待结果';
+  
+  chatMessages.appendChild(processingDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  
+  // 每5秒更新一次提示消息，增加用户体验
+  let dots = 0;
+  processingMessageInterval = setInterval(() => {
+    dots = (dots + 1) % 4;
+    const dotString = '.'.repeat(dots);
+    processingDiv.innerHTML = `<i>🔄</i> 数据正在后台飞快运算中，请耐心等待结果${dotString}`;
+  }, 1000);
+}
+
+// 移除处理中提示
+function removeProcessingMessage() {
+  const processingIndicator = document.getElementById('processingIndicator');
+  if (processingIndicator) {
+    processingIndicator.parentNode.removeChild(processingIndicator);
+  }
+  
+  if (processingMessageInterval) {
+    clearInterval(processingMessageInterval);
+    processingMessageInterval = null;
+  }
+}
+
+// 处理文件上传
+async function handleFileUpload(event) {
+  const files = Array.from(event.target.files);
+  
+  if (files.length > 0) {
+    for (const file of files) {
+      // 检查文件大小 (限制为 15MB)
+      if (file.size > 15 * 1024 * 1024) {
+        showError(`文件 "${file.name}" 太大，请选择小于 15MB 的文件`);
+        continue;
+      }
+      
+      try {
+        showTyping();
+        const fileId = await uploadFileToDify(file);
+        if (fileId) {
+          uploadedFiles.push(file);
+          uploadedFileIds.push(fileId);
+          console.log(`文件 ${file.name} 上传成功，ID: ${fileId}`);
+        }
+      } catch (error) {
+        console.error('文件上传失败:', error);
+        showError(`文件 "${file.name}" 上传失败: ${error.message}`);
+      } finally {
+        hideTyping();
+      }
+    }
+    
+    updateFilePreview();
+    checkSendButtonState(); // 更新发送按钮状态
+    event.target.value = ''; // 清空input
+  }
+}
+
+// 上传文件到Dify
+async function uploadFileToDify(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('user', DIFY_CONFIG.user);
+  
+  const response = await fetch(`${DIFY_CONFIG.baseUrl}/v1/files/upload`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${DIFY_CONFIG.apiKey}`
+    },
+    body: formData
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `HTTP ${response.status}`);
+  }
+  
+  const data = await response.json();
+  return data.id;
+}
+
+// 根据文件扩展名判断文件类型
+function getFileType(fileName) {
+  if (!fileName || typeof fileName !== 'string') {
+    console.warn('getFileType: fileName is undefined or not a string:', fileName);
+    return 'custom'; // 默认返回 custom 类型
+  }
+  const extension = fileName.toLowerCase().split('.').pop();
+  
+  // 文档类型
+  const documentTypes = ['txt', 'md', 'markdown', 'pdf', 'html', 'xlsx', 'xls', 'docx', 'csv', 'eml', 'msg', 'pptx', 'ppt', 'xml', 'epub'];
+  
+  // 图片类型
+  const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+  
+  if (documentTypes.includes(extension)) {
+    return 'document';
+  } else if (imageTypes.includes(extension)) {
+    return 'image';
+  } else {
+    return 'custom'; // 其他文件类型
+  }
+}
+
+// 更新文件预览
+function updateFilePreview() {
+  if (uploadedFiles.length === 0) {
+    filePreview.classList.remove('show');
+    return;
+  }
+  
+  filePreview.innerHTML = uploadedFiles.map((file, index) => `
+    <div class="file-item">
+      <div class="file-icon">📄</div>
+      <div class="file-name" title="${file.name}">${file.name}</div>
+      <button class="file-remove" onclick="removeFile(${index})" title="移除文件">✕</button>
+    </div>
+  `).join('');
+  
+  filePreview.classList.add('show');
+}
+
+// 移除文件
+function removeFile(index) {
+  uploadedFiles.splice(index, 1);
+  uploadedFileIds.splice(index, 1);
+  updateFilePreview();
+}
+
+// 添加消息到聊天区域
+function addMessage(content, isUser = true) {
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+  
+  const avatar = document.createElement('div');
+  avatar.className = `message-avatar ${isUser ? 'user-avatar' : 'bot-avatar'}`;
+  avatar.textContent = isUser ? '👤' : '🤖';
+  
+  const bubble = document.createElement('div');
+  bubble.className = 'message-bubble';
+  
+  if (typeof content === 'string') {
+    bubble.textContent = content;
+  } else {
+    bubble.appendChild(content);
+  }
+  
+  if (isUser) {
+    messageDiv.appendChild(bubble);
+    messageDiv.appendChild(avatar);
+  } else {
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(bubble);
+  }
+  
+  chatMessages.appendChild(messageDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  
+  return bubble;
+}
+
+// 显示加载状态
+function showTyping() {
+  typingIndicator.style.display = 'flex';
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// 隐藏加载状态
+function hideTyping() {
+  typingIndicator.style.display = 'none';
+}
+
+// 显示错误消息
+function showError(message) {
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'error-message';
+  errorDiv.textContent = message;
+  chatMessages.appendChild(errorDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  
+  // 5秒后自动移除错误消息
+  setTimeout(() => {
+    if (errorDiv.parentNode) {
+      errorDiv.parentNode.removeChild(errorDiv);
+    }
+  }, 5000);
+}
+
+// 发送消息到Dify工作流
+async function sendMessage() {
+  const message = messageInput.value.trim();
+  const selectedFeature = featureSelection.value;
+  
+  // 验证功能选择
+  if (!selectedFeature) {
+    showError('请先选择功能类型');
+    return;
+  }
+  
+  if (!message && uploadedFileIds.length === 0) {
+    showError('请输入消息或上传文件');
+    return;
+  }
+  
+  // 检查API密钥
+  if (DIFY_CONFIG.apiKey === 'YOUR_API_KEY') {
+    showError('请先配置您的Dify API密钥');
+    return;
+  }
+  
+  // 禁用发送按钮
+  sendBtn.disabled = true;
+  messageInput.disabled = true;
+  
+  // 添加用户消息
+  if (message) {
+    addMessage(message, true);
+  }
+  
+  // 如果有文件，显示文件信息
+  if (uploadedFiles.length > 0) {
+    const fileInfo = uploadedFiles.map(f => f.name).join(', ');
+    addMessage(`📎 已上传文件: ${fileInfo}`, true);
+  }
+  
+  // 清空输入
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+  
+  // 显示加载状态
+  showTyping();
+  
+  // 添加处理中提示
+  showProcessingMessage();
+  
+  try {
+    // 准备对话流输入参数
+    const requestData = {
+      inputs: {
+        Feature_selection: selectedFeature // 添加Feature_selection参数
+      },
+      query: message || '', // 直接将消息作为query参数
+      response_mode: 'streaming', // 流式输出
+      user: DIFY_CONFIG.user,
+    };
+    
+    // 如果有会话ID，添加到请求中
+    if (conversationId) {
+      requestData.conversation_id = conversationId;
+    }
+    
+    // 如果有文件，添加到请求中
+    if (uploadedFileIds.length > 0) {
+      requestData.files = uploadedFileIds.map((fileId, index) => ({
+        type: getFileType(uploadedFiles[index].name),
+        transfer_method: 'local_file',
+        upload_file_id: fileId
+      }));
+    }
+    
+    // 调用Dify对话流API
+    const response = await fetch(`${DIFY_CONFIG.baseUrl}/v1/chat-messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${DIFY_CONFIG.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP ${response.status}`);
+    }
+    
+    // 创建机器人消息容器（保留处理中提示，直到有实际内容）
+    currentBotMessage = addMessage('', false);
+    let accumulatedContent = '';
+    
+    // 处理流式响应
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    
+    let hasReceivedContent = false; // 标记是否已经收到内容
+    
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      
+      for (const line of lines) {
+        if (line.trim() === '') continue;
+        
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6).trim();
+          if (data === '[DONE]') {
+            console.log('对话完成');
+            break;
+          }
+          
+          try {
+            const parsed = JSON.parse(data);
+            
+            // 保存对话ID用于多轮对话
+            if (parsed.conversation_id) {
+              conversationId = parsed.conversation_id;
+            }
+            
+            // 根据事件类型处理不同的响应
+            if (parsed.event === 'message') {
+              let newContent = '';
+              
+              // 处理消息内容
+              if (parsed.message && parsed.message.content) {
+                newContent = parsed.message.content;
+              }
+              
+              // 处理答案内容
+              if (parsed.answer) {
+                newContent = parsed.answer;
+              }
+              
+              // 如果有新内容
+              if (newContent) {
+                // 收到了实际内容，可以移除处理中提示
+                if (!hasReceivedContent) {
+                  hasReceivedContent = true;
+                  removeProcessingMessage();
+                  hideTyping();
+                }
+                
+                // 累加到现有内容
+                accumulatedContent += newContent;
+                
+                // 直接处理Markdown格式文件链接为HTML下载按钮
+                let processedContent = accumulatedContent;
+                
+                // 直接将Markdown格式文件链接转换为HTML下载链接
+                const fileUrlRegex = /\[(.*?)\]\(((?:\/files\/tools\/|\/files\/).*?)\)/g;
+                processedContent = processedContent.replace(fileUrlRegex, (match, fileName, fileUrl) => {
+                  const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${DIFY_CONFIG.baseUrl}${fileUrl}`;
+                  return `<a href="${fullUrl}" class="file-download-inline" download="${fileName}" target="_blank">📥 ${fileName}</a>`;
+                });
+                
+                // 处理其他Markdown格式
+                processedContent = processedContent
+                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // 加粗
+                  .replace(/\*([^\*]+)\*/g, '<em>$1</em>')          // 斜体
+                  .replace(/\r\n/g, '\n')                           // 统一换行符
+                  .replace(/\n\n+/g, '<br><br>')                    // 多行换行变成段落分隔
+                  .replace(/\n/g, '<br>');                          // 单行换行变成HTML换行
+                
+                // 更新显示
+                currentBotMessage.innerHTML = processedContent;
+                
+                // 滚动到最新消息
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+              }
+            } 
+            else if (parsed.event === 'done') {
+              console.log("处理完成事件:", parsed);
+              
+              // 收到完成事件，删除处理中提示（如果还存在）
+              removeProcessingMessage();
+              hideTyping();
+              
+              // 处理文件数组
+              if (parsed.files && parsed.files.length > 0) {
+                console.log("发现文件数组:", parsed.files);
+                
+                // 创建文件下载区域
+                const filesDiv = document.createElement('div');
+                filesDiv.className = 'file-downloads';
+                filesDiv.innerHTML = '<strong>生成的文件：</strong><br>';
+                
+                parsed.files.forEach(file => {
+                  let fileUrl = file.url || file.remote_url;
+                  
+                  if (fileUrl) {
+                    // 确保文件URL包含baseUrl
+                    if (!fileUrl.startsWith('http')) {
+                      fileUrl = `${DIFY_CONFIG.baseUrl}${fileUrl}`;
+                      console.log("已添加baseUrl到文件链接:", fileUrl);
+                    }
+                    
+                    const fileName = file.filename || '下载文件';
+                    
+                    // 创建下载按钮
+                    const link = document.createElement('a');
+                    link.href = fileUrl;
+                    link.className = 'file-download';
+                    link.textContent = `📥 ${fileName}`;
+                    link.download = fileName;
+                    link.target = '_blank';
+                    filesDiv.appendChild(link);
+                    
+                    console.log("添加文件下载按钮:", fileName, "链接:", fileUrl);
+                  }
+                });
+                
+                // 添加到消息元素末尾
+                currentBotMessage.appendChild(filesDiv);
+                
+                // 滚动到最新消息
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+              }
+            } 
+            else if (parsed.event === 'error') {
+              // 出错时移除处理提示
+              removeProcessingMessage();
+              hideTyping();
+              throw new Error(parsed.message || '对话执行出错');
+            }
+          } catch (error) {
+            console.warn('解析响应数据失败:', error);
+          }
+        }
+      }
+    }
+    
+    // 确保在所有处理完成后移除处理中提示（以防前面逻辑没有执行到）
+    removeProcessingMessage();
+    hideTyping();
+    
+    // 清空已上传的文件
+    uploadedFiles = [];
+    uploadedFileIds = [];
+    updateFilePreview();
+    
+  } catch (error) {
+    // 确保错误时也移除处理中提示和加载状态
+    removeProcessingMessage(); 
+    hideTyping();
+    
+    console.error('发送消息失败:', error);
+    showError(`发送失败: ${error.message}`);
+    
+    // 如果有创建的消息容器但出错了，移除它
+    if (currentBotMessage && currentBotMessage.parentNode) {
+      currentBotMessage.parentNode.removeChild(currentBotMessage.parentNode);
+    }
+  } finally {
+    sendBtn.disabled = false;
+    messageInput.disabled = false;
+    messageInput.focus();
+    currentBotMessage = null;
+  }
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', () => {
+  messageInput.focus();
+  
+  // 检查API配置
+  if (DIFY_CONFIG.apiKey === 'YOUR_API_KEY') {
+    showError('请在代码中配置您的Dify API密钥后使用');
+  }
+  
+  // 初始化发送按钮状态
+  checkSendButtonState();
+});
+</script>
+
+</body>
+</html>
