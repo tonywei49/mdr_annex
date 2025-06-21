@@ -564,7 +564,7 @@ body {
       <p>本界面主要功能：</p>
       <p>（1）上传程序文件目录，选择“大致匹配”，输入框输入“请分析”，即可开始分析所有程序文件匹配的章节，以及缺少哪些附件。</p>
       <p>（2）上传程序文件或图纸，选择“精确分析”，输入框输入“查核内容”，即分析该文件匹配的章节，以及文件需要补强的地方。</p>
-      <p><small>支持格式：TXT, MD, PDF, DOC, DOCX, XLSX, XLS, CSV, PPT, PPTX, XML, EPUB, EML, MSG, HTML, JPG, JPEG, PNG, GIF, WEBP, SVG</small></p>
+      <p><small>支持格式：TXT, MD, PDF, DOC, DOCX, XLSX, XLS, CSV, HTML, JPG, JPEG, PNG</small></p>
     </div>
   </div>
 
@@ -593,7 +593,7 @@ body {
         
         <!-- 文件上传按钮 -->
         <button class="file-upload-btn" id="fileUploadBtn" title="上传文件">
-          <input type="file" id="fileInput" multiple accept=".txt,.md,.mdx,.markdown,.pdf,.html,.xlsx,.xls,.doc,.docx,.csv,.eml,.msg,.pptx,.ppt,.xml,.epub,.jpg,.jpeg,.png,.gif,.webp,.svg">
+          <input type="file" id="fileInput" multiple accept=".txt,.md,.mdx,.markdown,.pdf,.html,.xlsx,.xls,.doc,.docx,.csv,.jpg,.jpeg,.png">
           +
         </button>
       </div>
@@ -768,10 +768,10 @@ function getFileType(fileName) {
   const extension = fileName.toLowerCase().split('.').pop();
   
   // 文档类型
-  const documentTypes = ['txt', 'md', 'markdown', 'pdf', 'html', 'xlsx', 'xls', 'docx', 'csv', 'eml', 'msg', 'pptx', 'ppt', 'xml', 'epub'];
+  const documentTypes = ['txt', 'md', 'markdown', 'pdf', 'html', 'xlsx', 'xls', 'docx', 'csv'];
   
   // 图片类型
-  const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+  const imageTypes = ['jpg', 'jpeg', 'png'];
   
   if (documentTypes.includes(extension)) {
     return 'document';
